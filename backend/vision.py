@@ -57,5 +57,5 @@ def color_wall(image_path, color):
     # Convert blended image to uint8
     blended_image = np.clip(blended_image, 0, 255).astype(np.uint8)
 
-    cv2.imwrite(os.path.join(BASE_DIR, "modified_image.jpg"), blended_image)
+    return blended_image
 

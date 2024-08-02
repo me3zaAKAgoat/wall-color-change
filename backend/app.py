@@ -7,7 +7,9 @@ from flask_cors import CORS
 import os
 from util import read_image_from_url
 from dotenv import load_dotenv
+import tempfile
 from vision import color_wall
+import cv2
 
 load_dotenv()
 # Configuration       
@@ -83,7 +85,7 @@ def upload_image():
         user_urls = load_user_urls()
         user_urls[user_id] = secure_url
         save_user_urls(user_urls)
-        return jsonify({"secure_url": upload_result["secure_url"]}), 200
+        return jsonify({"image": upload_result["secure_url"]}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -102,8 +104,20 @@ def change_wall_color():
     if not cloudinary_url:
         return jsonify({"error": "User ID not found"}), 404
     
-    color_wall(cloudinary_url, color)
-    return jsonify({"message": "Wall color changed successfully"}), 200
+    image = color_wall(cloudinary_url, color)
+        # Save the image to a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp_file:
+        temp_filename = temp_file.name
+        cv2.imwrite(temp_filename, image)
+    
+    try:
+        # Upload the image to Cloudinary
+        response = cloudinary.uploader.upload(temp_filename, public_id=user_id, overwrite=True)
+        cloudinary_url = response["secure_url"]
+    finally:
+        # Clean up the temporary file
+        os.remove(temp_filename)
+    return jsonify({"image": cloudinary_url}), 200
 
 @app.route('/get_uploaded_image', methods=['GET'])
 def get_uploaded_image():
@@ -116,7 +130,7 @@ def get_uploaded_image():
     if not cloudinary_url:
         return jsonify({"error": "User ID not found"}), 404
 
-    return jsonify({"secure_url": cloudinary_url}), 200
+    return jsonify({"image": cloudinary_url}), 200
 
 # Run the app if this file is executed
 if __name__ == '__main__':
