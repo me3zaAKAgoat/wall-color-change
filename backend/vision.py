@@ -3,15 +3,30 @@ from wizart.vision import ComputerVisionClient as vc
 from dotenv import load_dotenv
 import os
 import numpy as np
+from util import read_image_from_url
 
 # Load environment variables
 load_dotenv()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WIZART_AI_TOKEN = os.getenv("WIZART_AI_TOKEN")
 
-def detect_segment():
-    image_path = os.path.join(BASE_DIR, "image.jpg")
-    image = cv2.imread(image_path)
+def hex_to_bgr(hex_color):
+    # Ensure the hex color is in the format #RRGGBB
+    hex_color = hex_color.lstrip('#')
+    if len(hex_color) != 6:
+        raise ValueError("Hex color code must be in the format #RRGGBB")
+    
+    # Convert hex to RGB
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+    
+    # Return BGR format (OpenCV uses BGR)
+    return [b, g, r]
+
+
+def color_wall(image_path, color):
+    image = read_image_from_url(image_path)
 
     # Initialize the ComputerVisionClient
     client = vc(token=WIZART_AI_TOKEN)
@@ -23,7 +38,7 @@ def detect_segment():
     mask = cv2.resize(mask, (image.shape[1], image.shape[0]))
 
     # Define the new color (in BGR format)
-    new_color = [0, 255, 0]  # Green color
+    new_color = hex_to_bgr(color)
     alpha = 0.5  # Transparency factor (0.0 to 1.0)
 
     # Create a colored mask with the new color
@@ -42,12 +57,5 @@ def detect_segment():
     # Convert blended image to uint8
     blended_image = np.clip(blended_image, 0, 255).astype(np.uint8)
 
-    # Display the final image
-    cv2.imshow("Modified Image", blended_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    # Save the modified image (optional)
     cv2.imwrite(os.path.join(BASE_DIR, "modified_image.jpg"), blended_image)
 
-detect_segment()
