@@ -132,7 +132,7 @@ def get_uploaded_image():
     user_urls = load_user_urls()
     cloudinary_url = user_urls.get(user_id)
     if not cloudinary_url:
-        return jsonify({"error": "User ID not found"}), 404
+        return jsonify({"image": None}), 204
 
     return jsonify({"image": cloudinary_url}), 200
 
