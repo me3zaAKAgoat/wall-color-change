@@ -12,22 +12,47 @@ function generateUniqueId(length = 16) {
   ).join("");
 }
 
+const colorCategories = {
+  neutrals: ["#EAEAEA", "#D3D3D3"], // Warm neutrals are tricky to translate directly, as they're usually described in terms of undertone rather than strict hex codes.
+  modern: ["#FFFFFF", "#F2F2F2"], // Snowbound and Creamy equivalents
+  classics: ["#D5CBB2", "#D2CEC6"], // Accessible Beige and City Loft equivalents
+  darkAndMoody: ["#0C0D0F", "#2F2F2F"], // Dark Night and Charcoal Blue equivalents
+  boldAndVibrant: ["#FF6347", "#FFA500"], // Red Tomato and Outgoing Orange equivalents
+  rustic: ["#C19A6B", "#8B4513"], // Colors inspired by the feel of Rustic Retreat
+  farmhouse: ["#F5F5DC", "#FAF0E6"], // Light, muted colors like Beige and Creamy
+  midCenturyModern: ["#C0C0C0", "#D2691E"], // City Loft and Red Tomato equivalents
+  bohemian: ["#FF4500", "#D2B48C"], // Red Tomato and earthy tones
+  coastal: ["#F5F5F5", "#4682B4"], // Light colors and ocean-inspired hues
+  scandinavian: ["#FFFFFF", "#F0F0F0"], // Clean, white shades
+};
+
 const colors = [
-  "#1E90FF",
+  "#EAEAEA",
+  "#D2CEC6",
+  "#0C0D0F",
+  "#2F2F2F",
+  "#FFFFFF",
   "#FF6347",
-  "#32CD32",
-  "#FFD700",
-  "#FF69B4",
-  "#8A2BE2",
-  "#7FFF00",
-  "#DC143C",
-  "#00CED1",
+  "#C19A6B",
+  "#8B4513",
+  "#F5F5DC",
+  "#D5CBB2",
+  "#FAF0E6",
+  "#C0C0C0",
+  "#F2F2F2",
+  "#D2691E",
+  "#D3D3D3",
   "#FF4500",
+  "#F5F5F5",
+  "#D2B48C",
+  "#4682B4",
+  "#FFA500",
+  "#FFFFFF",
+  "#F0F0F0",
 ];
 
 function App() {
   const [image, setImage] = useState(null);
-  const [imageToUpload, setImageToUpload] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -63,8 +88,7 @@ function App() {
     fetchImage();
   }, []);
 
-  const handleUpload = async (e) => {
-    e.preventDefault();
+  const handleUpload = async (imageToUpload) => {
     if (!imageToUpload) {
       setError("No file selected for upload.");
       return;
@@ -124,30 +148,42 @@ function App() {
         backgroundPosition: "center",
       }}
     >
+      <img
+        src="/that1painter.png"
+        alt="logo"
+        className="h-12 rounded-full bg-white p-4 py-1 top-10 left-[50%] transform -translate-x-1/2 absolute"
+      />
+      <input
+        id="file-input"
+        type="file"
+        name="image"
+        onChange={(e) => handleUpload(e.target.files[0])}
+      />
+      <label
+        htmlFor="file-input"
+        className="px-3 pb-2 pt-1 rounded-lg cursor-pointer absolute top-11 right-5 transition-all backdrop-blur border border-white/20"
+      >
+        <img src="/upload.svg" alt="upload" className="w-5 h-5 inline-block" />
+      </label>
       {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleUpload} method="POST" encType="multipart/form-data">
-        <input
-          type="file"
-          name="image"
-          onChange={(e) => setImageToUpload(e.target.files[0])}
-        />
-        <button type="submit">Upload</button>
-      </form>
-      <ul className="absolute bottom-10 flex items-center justify-start gap-2 w-[50vw] overflow-auto border border-white/40 rounded-xl py-4 px-2 backdrop-blur-lg">
-        {colors.map((color) => (
-          <li key={color}>
-            <button
-              type="submit"
-              style={{
-                backgroundColor: color,
-                width: "50px",
-                height: "50px",
-              }}
-              onClick={() => handleColorClick(color)}
-            />
-          </li>
-        ))}
-      </ul>
+      <div className="absolute bottom-10  w-[60vw] overflow-auto border border-white/80 rounded-3xl px-6 py-4 backdrop-blur-xl">
+        <ul className="flex items-center justify-start gap-2 overflow-auto">
+          {colors.map((color) => (
+            <li key={color}>
+              <button
+                type="submit"
+                className="rounded-xl"
+                style={{
+                  backgroundColor: color,
+                  width: "50px",
+                  height: "50px",
+                }}
+                onClick={() => handleColorClick(color)}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

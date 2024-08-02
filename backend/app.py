@@ -51,8 +51,12 @@ def save_user_urls(data):
     with open(JSON_FILE, 'w') as file:
         json.dump(data, file, indent=4)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='build', static_url_path='/')
 CORS(app)
+
+@app.route('/')
+def index():
+	return app.send_static_file('index.html')
 
 # Define a route for the root URL (/)
 @app.route('/')
