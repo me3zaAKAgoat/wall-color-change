@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 import cloudinary
 import cloudinary.uploader
 import numpy as np
+from flask_cors import CORS
 import os
 from util import read_image_from_url
 from dotenv import load_dotenv
@@ -49,14 +50,15 @@ def save_user_urls(data):
         json.dump(data, file, indent=4)
 
 app = Flask(__name__)
+CORS(app)
 
 # Define a route for the root URL (/)
 @app.route('/')
 def home():
     return "Hello, Flask!"
 
-@app.route('/upload', methods=['POST'])
-def upload():
+@app.route('/upload_image', methods=['POST'])
+def upload_image():
     if 'file' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
 
@@ -102,6 +104,19 @@ def change_wall_color():
     
     color_wall(cloudinary_url, color)
     return jsonify({"message": "Wall color changed successfully"}), 200
+
+@app.route('/get_uploaded_image', methods=['GET'])
+def get_uploaded_image():
+    if 'user_id' not in request.args:
+        return jsonify({"error": "Missing user_id parameter"}), 400
+
+    user_id = request.args['user_id']
+    user_urls = load_user_urls()
+    cloudinary_url = user_urls.get(user_id)
+    if not cloudinary_url:
+        return jsonify({"error": "User ID not found"}), 404
+
+    return jsonify({"secure_url": cloudinary_url}), 200
 
 # Run the app if this file is executed
 if __name__ == '__main__':
