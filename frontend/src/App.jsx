@@ -76,7 +76,6 @@ function App() {
             },
           }
         );
-        setLoading(false);
 
         if (!response.ok) {
           throw new Error("Failed to fetch image");
@@ -88,9 +87,10 @@ function App() {
         const data = await response.json();
         setImage(data.image);
       } catch (error) {
-        setLoading(false);
         setError(error.message);
         console.error("Error fetching image:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -114,7 +114,6 @@ function App() {
         body: formData,
       });
 
-      setLoading(false);
       if (!response.ok) {
         throw new Error("Failed to upload image");
       }
@@ -123,9 +122,10 @@ function App() {
       setImage(data.image);
       setError(null); // Clear any previous errors
     } catch (error) {
-      setLoading(false);
       setError(error.message);
       console.error("Error uploading image:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,7 +140,6 @@ function App() {
         method: "POST",
         body: formData,
       });
-      setLoading(false);
 
       if (!response.ok) {
         throw new Error("Failed to set background color");
@@ -150,23 +149,26 @@ function App() {
       setImage(data.image);
       setError(null); // Clear any previous errors
     } catch (error) {
-      setLoading(false);
       setError(error.message);
       console.error("Error setting background color:", error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
     <div
       className="h-screen w-full flex flex-col items-center justify-center relative"
       style={{
+        backgroundColor: `${image? "white" : "black"}`,
         backgroundImage: `url(${image})`,
-        backgroundSize: "cover",
+        backgroundSize: "contain",
         backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       <label
         htmlFor="file-input"
-        className={`vite-button rounded-lg cursor-pointer absolute transition-all backdrop-blur border border-white/20 capitalize text-center ${
+        className={`text-white vite-button rounded-lg cursor-pointer absolute transition-all backdrop-blur border border-white/20 capitalize text-center ${
           image
             ? "top-11 left-7 px-3 pb-2 pt-1"
             : "top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 p-3"
@@ -192,7 +194,7 @@ function App() {
       <img
         src="/that1painter.png"
         alt="logo"
-        className="h-12 rounded-full bg-white p-4 py-1 top-10 left-[50%] transform -translate-x-1/2 absolute"
+        className="h-10 rounded-full bg-white p-4 py-2 top-10 left-[50%] transform -translate-x-1/2 absolute"
       />
       <button className="vite-button px-3 pb-2 pt-1 rounded-lg cursor-pointer absolute top-11 right-7 transition-all backdrop-blur border border-white/20">
         <img src="/share.png" alt="share" className="w-5 h-5 inline-block" />
@@ -206,7 +208,7 @@ function App() {
           <div></div>
         </div>
       )}
-      <div className="absolute bottom-28 w-[60vw] overflow-auto border border-white/80 rounded-3xl px-6 py-4 backdrop-blur-xl">
+      <div className="absolute bottom-28 w-[80vw] overflow-auto border border-white/80 rounded-2xl p-3 backdrop-blur-xl">
         <ul className="flex items-center justify-start gap-2 overflow-auto">
           {colors.map((color) => (
             <li key={color}>
