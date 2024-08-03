@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+const apiUrl = import.meta.env.VITE_API_URL || "";
+
 function generateUniqueId(length = 16) {
   const charset =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -32,7 +34,6 @@ const colors = [
   "#D2CEC6",
   "#0C0D0F",
   "#2F2F2F",
-  "#FFFFFF",
   "#FF6347",
   "#C19A6B",
   "#8B4513",
@@ -67,7 +68,7 @@ function App() {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:5000/get_uploaded_image?user_id=${userId}`,
+          `${apiUrl}/get_uploaded_image?user_id=${userId}`,
           {
             method: "GET",
             headers: {
@@ -87,6 +88,7 @@ function App() {
         const data = await response.json();
         setImage(data.image);
       } catch (error) {
+        setLoading(false);
         setError(error.message);
         console.error("Error fetching image:", error);
       }
@@ -107,7 +109,7 @@ function App() {
       formData.append("user_id", window.localStorage.getItem("userId"));
 
       setLoading(true);
-      const response = await fetch("http://localhost:5000/upload_image", {
+      const response = await fetch(`${apiUrl}/upload_image`, {
         method: "POST",
         body: formData,
       });
@@ -121,6 +123,7 @@ function App() {
       setImage(data.image);
       setError(null); // Clear any previous errors
     } catch (error) {
+      setLoading(false);
       setError(error.message);
       console.error("Error uploading image:", error);
     }
@@ -133,7 +136,7 @@ function App() {
       formData.append("user_id", window.localStorage.getItem("userId"));
 
       setLoading(true);
-      const response = await fetch("http://localhost:5000/change_wall_color", {
+      const response = await fetch(`${apiUrl}/change_wall_color`, {
         method: "POST",
         body: formData,
       });
@@ -147,6 +150,7 @@ function App() {
       setImage(data.image);
       setError(null); // Clear any previous errors
     } catch (error) {
+      setLoading(false);
       setError(error.message);
       console.error("Error setting background color:", error);
     }
@@ -195,7 +199,7 @@ function App() {
       </button>
       {error && <p className="text-red-500">{error}</p>}
       {loading && (
-        <div class="lds-ellipsis">
+        <div className="lds-ellipsis">
           <div></div>
           <div></div>
           <div></div>
