@@ -1,6 +1,7 @@
 cd frontend
 npm i && npm run build
-mv ./dist ../backend/build
+rm -rf ../backend/build
+mv ./dist ../backend/build/
 cd ../backend
 python3 -m venv ./.venv
 source ./.venv/bin/activate
